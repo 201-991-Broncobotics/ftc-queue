@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 devDependencies:
+  '@cloudflare/workers-types':
+    specifier: ^4.20231218.0
+    version: 4.20231218.0
   '@sveltejs/adapter-auto':
     specifier: ^3.0.0
     version: 3.1.0(@sveltejs/kit@2.2.2)

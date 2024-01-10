@@ -1,0 +1,4 @@
+[[d1_databases]]
+binding = "DB"
+database_name = "ftc-queue"
+database_id = "bc95e710-f067-4c35-aa84-5d01b5d4a4e4"
