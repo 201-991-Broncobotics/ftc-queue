@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, text, primaryKey } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 
 export const teams = sqliteTable('teams', {
@@ -20,13 +20,16 @@ export const users = sqliteTable('users', {
 
 export const competitions = sqliteTable('competitions', {
   // no spaces (toa competition)
-  name: text('id').primaryKey()
+  name: text('name').primaryKey()
 });
 
 export const matches = sqliteTable('matches', {
   id: text('id').primaryKey(),
-  isDone: integer('is_done', { mode: 'boolean' }).notNull(),
-  isQueing: integer('is_queing', { mode: 'boolean' }).notNull()
+  isDone: integer('is_done', { mode: 'boolean' }).notNull().default(false),
+  isQueing: integer('is_queing', { mode: 'boolean' }).notNull().default(false),
+  competitionName: text('competition_name')
+    .notNull()
+    .references(() => competitions.name)
 });
 
 export const sessions = sqliteTable('sessions', {
@@ -37,27 +40,37 @@ export const sessions = sqliteTable('sessions', {
   expiresAt: integer('expires_at').notNull()
 });
 
-export const teamToMatch = sqliteTable('team_match', {
-  teamId: text('team_id')
-    .notNull()
-    .references(() => teams.id),
-  matchId: text('match_id')
-    .notNull()
-    .references(() => matches.id),
-  alliance: text('alliance', { enum: ['R1', 'R2', 'R3', 'B1', 'B2', 'B3'] }).notNull()
-});
+export const teamToMatch = sqliteTable(
+  'team_match',
+  {
+    teamId: text('team_id')
+      .notNull()
+      .references(() => teams.id),
+    matchId: text('match_id')
+      .notNull()
+      .references(() => matches.id),
+    alliance: text('alliance', { enum: ['R1', 'R2', 'R3', 'B1', 'B2', 'B3'] }).notNull()
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.teamId, t.matchId] }) })
+);
 
-export const teamToUser = sqliteTable('team_user', {
-  teamId: text('team_id')
-    .notNull()
-    .references(() => teams.id),
-  userId: text('user_id')
-    .notNull()
-    .references(() => users.id)
-});
+export const teamToUser = sqliteTable(
+  'team_user',
+  {
+    teamId: text('team_id')
+      .notNull()
+      .references(() => teams.id),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id)
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.teamId, t.userId] }) })
+);
 
 export const teamsRelations = relations(teams, ({ many, one }) => ({
-  users: many(teamToUser),
+  users: many(teamToUser, {
+    relationName: 'users'
+  }),
   competition: one(competitions, {
     fields: [teams.competitionId],
     references: [competitions.name]
@@ -65,7 +78,16 @@ export const teamsRelations = relations(teams, ({ many, one }) => ({
 }));
 
 export const competitionsRelations = relations(competitions, ({ many }) => ({
-  teams: many(teams)
+  teams: many(teams),
+  matches: many(matches)
+}));
+
+export const matchesRelations = relations(matches, ({ many, one }) => ({
+  teams: many(teamToMatch),
+  competitions: one(competitions, {
+    fields: [matches.competitionName],
+    references: [competitions.name]
+  })
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
