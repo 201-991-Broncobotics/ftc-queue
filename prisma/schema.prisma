@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator kysely {
+  provider = "prisma-kysely"
+  output   = "../src/lib/db"
+  fileName = "types.ts"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../db.sqlite"
+}
+
+model Teams {
+  id          String @id
+  team_number Int
+
+  Competitions     Competitions  @relation(fields: [competitionsName], references: [name])
+  competitionsName String
+  TeamToMatch      TeamToMatch[]
+}
+
+model Competitions {
+  name    String    @id
+  teams   Teams[]
+  matches Matches[]
+}
+
+model Matches {
+  id        String  @id
+  isQueuing Boolean
+  isDone    Boolean
+
+  Competitions     Competitions @relation(fields: [competitionsName], references: [name])
+  competitionsName String
+
+  teams TeamToMatch[]
+}
+
+model TeamToMatch {
+  // Red1, Red2, Red3, Blue1, Blue2, Blue3
+  alliance String
+
+  Teams  Teams  @relation(fields: [teamId], references: [id])
+  teamId String
+
+  Matches Matches @relation(fields: [matchId], references: [id])
+  matchId String
+
+  @@id([teamId, matchId])
+}
