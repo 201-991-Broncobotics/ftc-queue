@@ -3,7 +3,9 @@
 declare global {
 	namespace App {
 		// interface Error {}
-		// interface Locals {}
+		interface Locals {
+			db: import('$lib/db.server').DB;
+		}
 		// interface PageData {}
 		// interface PageState {}
 		interface Platform {
