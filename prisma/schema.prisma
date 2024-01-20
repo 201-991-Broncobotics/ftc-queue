@@ -12,12 +12,26 @@ datasource db {
   url      = "file:../db.sqlite"
 }
 
+model Users {
+  id        String @id
+  google_id String @unique
+
+  Session Sessions[]
+}
+
+model Sessions {
+  id         String @id
+  expires_at Int
+  user       Users  @relation(fields: [user_id], references: [id])
+  user_id    String
+}
+
 model Teams {
   id          String @id
   team_number Int
 
-  Competitions     Competitions  @relation(fields: [competitionsName], references: [name])
-  competitionsName String
+  Competitions     Competitions  @relation(fields: [competition_name], references: [name])
+  competition_name String
   TeamToMatch      TeamToMatch[]
 }
 
@@ -28,12 +42,12 @@ model Competitions {
 }
 
 model Matches {
-  id        String  @id
-  isQueuing Boolean
-  isDone    Boolean
+  id         String  @id
+  is_queuing Boolean
+  is_done    Boolean
 
-  Competitions     Competitions @relation(fields: [competitionsName], references: [name])
-  competitionsName String
+  Competitions     Competitions @relation(fields: [competition_name], references: [name])
+  competition_name String
 
   teams TeamToMatch[]
 }
@@ -42,11 +56,11 @@ model TeamToMatch {
   // Red1, Red2, Red3, Blue1, Blue2, Blue3
   alliance String
 
-  Teams  Teams  @relation(fields: [teamId], references: [id])
-  teamId String
+  Teams   Teams  @relation(fields: [team_id], references: [id])
+  team_id String
 
-  Matches Matches @relation(fields: [matchId], references: [id])
-  matchId String
+  Matches  Matches @relation(fields: [match_id], references: [id])
+  match_id String
 
-  @@id([teamId, matchId])
+  @@id([team_id, match_id])
 }

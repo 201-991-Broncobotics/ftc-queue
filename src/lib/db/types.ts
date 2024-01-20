@@ -9,23 +9,34 @@ export type Competitions = {
 };
 export type Matches = {
     id: string;
-    isQueuing: number;
-    isDone: number;
-    competitionsName: string;
+    is_queuing: number;
+    is_done: number;
+    competition_name: string;
+};
+export type Sessions = {
+    id: string;
+    expires_at: number;
+    user_id: string;
 };
 export type Teams = {
     id: string;
     team_number: number;
-    competitionsName: string;
+    competition_name: string;
 };
 export type TeamToMatch = {
     alliance: string;
-    teamId: string;
-    matchId: string;
+    team_id: string;
+    match_id: string;
+};
+export type Users = {
+    id: string;
+    google_id: string;
 };
 export type DB = {
     Competitions: Competitions;
     Matches: Matches;
+    Sessions: Sessions;
     Teams: Teams;
     TeamToMatch: TeamToMatch;
+    Users: Users;
 };

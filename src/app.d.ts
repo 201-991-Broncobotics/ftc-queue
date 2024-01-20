@@ -4,7 +4,10 @@ declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-			db: import('$lib/db.server').Databse;
+			db: import('$lib/db.server').Database;
+			user: import('lucia').User | null;
+			session: import('lucia').Session | null;
+			lucia: import('lucia').Lucia;
 		}
 		// interface PageData {}
 		// interface PageState {}
