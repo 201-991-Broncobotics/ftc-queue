@@ -1,3 +1,4 @@
+import { dev } from '$app/environment';
 import { initializeLucia } from '$lib/auth.server';
 import type { DB } from '$lib/db/types';
 import type { Handle } from '@sveltejs/kit';
@@ -6,15 +7,19 @@ import { BunSqliteDialect } from 'kysely-bun-sqlite';
 import { D1Dialect } from 'kysely-d1';
 
 export const handle: Handle = async ({ resolve, event }) => {
-  const d1db = event.platform?.env.DB;
-
   let lucia: import('lucia').Lucia;
 
-  if (d1db) {
-    const dialect = new D1Dialect({ database: d1db });
-    event.locals.db = new Kysely<DB>({ dialect });
+  if (!dev) {
+    const db = event.platform?.env.DB;
+    if (db) {
+      const dialect = new D1Dialect({ database: db });
+      event.locals.db = new Kysely<DB>({ dialect });
 
-    lucia = await initializeLucia(d1db);
+      lucia = await initializeLucia(db);
+    } else {
+      // when we're built, we're probably on cloudflare
+      lucia = await initializeLucia(null as any);
+    }
   } else {
     const { Database } = await import('bun:sqlite');
     const db = new Database('db.sqlite');

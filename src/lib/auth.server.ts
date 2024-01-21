@@ -2,7 +2,7 @@ import { Lucia } from 'lucia';
 import { Google } from 'arctic';
 import { dev } from '$app/environment';
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '$env/static/private';
-import { D1Database } from '@cloudflare/workers-types';
+import type { D1Database } from '@cloudflare/workers-types';
 import type { Database } from 'bun:sqlite';
 import { D1Adapter, BunSQLiteAdapter } from '@lucia-auth/adapter-sqlite';
 
