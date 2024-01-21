@@ -4,6 +4,7 @@ import type { RequestEvent } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '$env/static/private';
 import { nanoid } from '$lib/nanoid.server';
+import { parseJWT } from 'oslo/jwt';
 
 export async function GET(event: RequestEvent) {
   const { lucia, db } = event.locals;
@@ -30,7 +31,7 @@ export async function GET(event: RequestEvent) {
     code_verifier: storedCodeVerifier
   });
 
-  const id_token = await fetch('https://oauth2.googleapis.com/token', {
+  const jwt = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     body: params.toString(),
     headers: {
@@ -40,8 +41,7 @@ export async function GET(event: RequestEvent) {
     .then((res) => res.json())
     .then(({ id_token }) => id_token as string);
 
-  const google_uid = JSON.parse(Buffer.from(id_token.split('.')[1]!, 'base64').toString())
-    .sub as string;
+  const { sub: google_uid } = parseJWT(jwt)!.payload as any;
 
   const existingUser = await db
     .selectFrom('Users')
