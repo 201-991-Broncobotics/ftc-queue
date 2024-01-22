@@ -16,7 +16,8 @@ model Users {
   id        String @id
   google_id String @unique
 
-  Session Sessions[]
+  Session      Sessions[]
+  Competitions Competitions[]
 }
 
 model Sessions {
@@ -36,9 +37,12 @@ model Teams {
 }
 
 model Competitions {
-  name    String    @id
+  name   String @id
+  secret String
+
   teams   Teams[]
   matches Matches[]
+  users   Users[]
 }
 
 model Matches {
