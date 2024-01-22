@@ -1,4 +1,4 @@
-import { google } from '$lib/auth.server';
+import { google, redirectURL } from '$lib/auth.server';
 import { OAuth2RequestError } from 'oslo/oauth2';
 import type { RequestEvent } from './$types';
 import { redirect } from '@sveltejs/kit';
@@ -26,7 +26,7 @@ export async function GET(event: RequestEvent) {
     code,
     client_id: GOOGLE_CLIENT_ID,
     client_secret: GOOGLE_CLIENT_SECRET,
-    redirect_uri: 'http://localhost:5173/auth/google/callback',
+    redirect_uri: redirectURL,
     grant_type: 'authorization_code',
     code_verifier: storedCodeVerifier
   });

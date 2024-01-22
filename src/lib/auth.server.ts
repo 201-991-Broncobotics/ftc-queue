@@ -35,10 +35,8 @@ declare module 'lucia' {
   }
 }
 
-export const google = new Google(
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  dev
-    ? 'http://localhost:5173/auth/google/callback'
-    : 'https://q.broncobotics.org/auth/google/callback'
-);
+export const redirectURL = dev
+  ? 'http://localhost:5173/auth/google/callback'
+  : 'https://q.broncobotics.org/auth/google/callback';
+
+export const google = new Google(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, redirectURL);
