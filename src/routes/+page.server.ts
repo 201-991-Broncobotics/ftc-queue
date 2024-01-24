@@ -1,9 +1,9 @@
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
-	platform?.env.DB;
+  platform?.env.DB;
 
-	return {
-		user: locals.user
-	};
+  return {
+    user: locals.user,
+  };
 };
