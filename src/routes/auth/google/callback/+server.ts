@@ -7,72 +7,72 @@ import { nanoid } from '$lib/nanoid.server';
 import { parseJWT } from 'oslo/jwt';
 
 export async function GET(event: RequestEvent) {
-  const { lucia, db } = event.locals;
+	const { lucia, db } = event.locals;
 
-  const code = event.url.searchParams.get('code');
-  const state = event.url.searchParams.get('state');
+	const code = event.url.searchParams.get('code');
+	const state = event.url.searchParams.get('state');
 
-  const storedState = event.cookies.get('google_auth_state');
-  const storedCodeVerifier = event.cookies.get('google_auth_code_verifier');
+	const storedState = event.cookies.get('google_auth_state');
+	const storedCodeVerifier = event.cookies.get('google_auth_code_verifier');
 
-  if (!code || !storedState || !storedCodeVerifier || state !== storedState) {
-    // 400
-    throw new Error('Invalid request');
-  }
+	if (!code || !storedState || !storedCodeVerifier || state !== storedState) {
+		// 400
+		throw new Error('Invalid request');
+	}
 
-  console.log('hereeee');
+	console.log('hereeee');
 
-  const params = new URLSearchParams({
-    code,
-    client_id: GOOGLE_CLIENT_ID,
-    client_secret: GOOGLE_CLIENT_SECRET,
-    redirect_uri: redirectURL,
-    grant_type: 'authorization_code',
-    code_verifier: storedCodeVerifier
-  });
+	const params = new URLSearchParams({
+		code,
+		client_id: GOOGLE_CLIENT_ID,
+		client_secret: GOOGLE_CLIENT_SECRET,
+		redirect_uri: redirectURL,
+		grant_type: 'authorization_code',
+		code_verifier: storedCodeVerifier
+	});
 
-  const jwt = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    body: params.toString(),
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  })
-    .then((res) => res.json())
-    .then(({ id_token }) => id_token as string);
+	const jwt = await fetch('https://oauth2.googleapis.com/token', {
+		method: 'POST',
+		body: params.toString(),
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
+		}
+	})
+		.then((res) => res.json())
+		.then(({ id_token }) => id_token as string);
 
-  const { sub: google_uid } = parseJWT(jwt)!.payload as any;
+	const { sub: google_uid } = parseJWT(jwt)!.payload as any;
 
-  const existingUser = await db
-    .selectFrom('Users')
-    .where('google_id', '=', google_uid)
-    .selectAll()
-    .executeTakeFirst();
+	const existingUser = await db
+		.selectFrom('Users')
+		.where('google_id', '=', google_uid)
+		.selectAll()
+		.executeTakeFirst();
 
-  let userID = existingUser?.id;
+	let userID = existingUser?.id;
 
-  if (existingUser) {
-  } else {
-    const uid = nanoid();
+	if (existingUser) {
+	} else {
+		const uid = nanoid();
 
-    await db
-      .insertInto('Users')
-      .values({
-        id: uid,
-        google_id: google_uid
-      })
-      .execute();
+		await db
+			.insertInto('Users')
+			.values({
+				id: uid,
+				google_id: google_uid
+			})
+			.execute();
 
-    userID = uid;
-  }
+		userID = uid;
+	}
 
-  const session = await lucia.createSession(userID!, {});
-  const sessionCookie = lucia.createSessionCookie(session.id);
+	const session = await lucia.createSession(userID!, {});
+	const sessionCookie = lucia.createSessionCookie(session.id);
 
-  event.cookies.set(sessionCookie.name, sessionCookie.value, {
-    path: '.',
-    ...sessionCookie.attributes
-  });
+	event.cookies.set(sessionCookie.name, sessionCookie.value, {
+		path: '.',
+		...sessionCookie.attributes
+	});
 
-  return redirect(302, '/');
+	return redirect(302, '/');
 }
