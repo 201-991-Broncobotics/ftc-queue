@@ -6,6 +6,12 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export type Competitions = {
     name: string;
+    secret: string;
+    toa_id: string;
+};
+export type CompetitionsToUsers = {
+    A: string;
+    B: string;
 };
 export type Matches = {
     id: string;
@@ -31,8 +37,10 @@ export type TeamToMatch = {
 export type Users = {
     id: string;
     google_id: string;
+    phone_number: string | null;
 };
 export type DB = {
+    _CompetitionsToUsers: CompetitionsToUsers;
     Competitions: Competitions;
     Matches: Matches;
     Sessions: Sessions;

@@ -13,11 +13,14 @@ datasource db {
 }
 
 model Users {
-  id        String @id
-  google_id String @unique
+  id           String  @id
+  google_id    String  @unique
+  phone_number String?
 
   Session      Sessions[]
   Competitions Competitions[]
+
+  @@index([phone_number], name: "phone_number")
 }
 
 model Sessions {
@@ -31,14 +34,15 @@ model Teams {
   id          String @id
   team_number Int
 
-  Competitions     Competitions  @relation(fields: [competition_name], references: [name])
+  Competitions     Competitions  @relation(fields: [competition_name], references: [id])
   competition_name String
   TeamToMatch      TeamToMatch[]
 }
 
 model Competitions {
-  name   String @id
+  id     String @id @map("name")
   secret String
+  toa_id String
 
   teams   Teams[]
   matches Matches[]
@@ -50,7 +54,7 @@ model Matches {
   is_queuing Boolean
   is_done    Boolean
 
-  Competitions     Competitions @relation(fields: [competition_name], references: [name])
+  Competitions     Competitions @relation(fields: [competition_name], references: [id])
   competition_name String
 
   teams TeamToMatch[]

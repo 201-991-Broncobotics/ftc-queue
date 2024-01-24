@@ -4,20 +4,22 @@ import { nanoid } from './nanoid.server';
 
 export type Database = Kysely<DB>;
 
-export async function createCompetition(db: Database, name: string, userId: string) {
+export async function createCompetition(db: Database, toaId: string, name: string, userId: string) {
   await db.transaction().execute(async (tx) => {
     await tx
       .insertInto('Competitions')
       .values({
-        name,
-        secret: nanoid()
+        toa_id: toaId,
+        // it's called "secret", but we dgaf about security for this, and being able to type it easily could be useful
+        secret: nanoid(8),
+        name
       })
       .execute();
 
     await tx
       .insertInto('_CompetitionsToUsers')
       .values({
-        A: name,
+        A: toaId,
         B: userId
       })
       .execute();
