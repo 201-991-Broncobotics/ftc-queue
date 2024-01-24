@@ -1,11 +1,11 @@
 import { google, redirectURL } from "$lib/auth.server";
-import { OAuth2RequestError } from "oslo/oauth2";
 import type { RequestEvent } from "./$types";
 import { redirect } from "@sveltejs/kit";
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "$env/static/private";
 import { nanoid } from "$lib/nanoid.server";
 import { parseJWT } from "oslo/jwt";
 
+// TODO: fix this ugly ass function
 export async function GET(event: RequestEvent) {
   const { lucia, db } = event.locals;
 
@@ -31,17 +31,28 @@ export async function GET(event: RequestEvent) {
     code_verifier: storedCodeVerifier,
   });
 
-  const jwt = await fetch("https://oauth2.googleapis.com/token", {
+  const tokens = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     body: params.toString(),
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-  })
-    .then((res) => res.json())
-    .then(({ id_token }) => id_token as string);
+  }).then((res) => res.json());
 
-  const { sub: google_uid } = parseJWT(jwt)!.payload as any;
+  const { picture, name } = await fetch(
+    "https://openidconnect.googleapis.com/v1/userinfo",
+    {
+      headers: {
+        Authorization: `Bearer ${tokens.access_token}`,
+      },
+    },
+  ).then((res) => res.json());
+
+  console.log(tokens);
+  const jwt = tokens.id_token;
+
+  const { sub: google_uid, ...rest } = parseJWT(jwt)!.payload as any;
+  console.table(rest);
 
   const existingUser = await db
     .selectFrom("Users")
@@ -60,6 +71,8 @@ export async function GET(event: RequestEvent) {
       .values({
         id: uid,
         google_id: google_uid,
+        pfp_url: picture,
+        name,
       })
       .execute();
 

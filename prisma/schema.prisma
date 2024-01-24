@@ -15,6 +15,8 @@ datasource db {
 model Users {
   id           String  @id
   google_id    String  @unique
+  pfp_url      String
+  name         String
   phone_number String?
 
   Session      Sessions[]

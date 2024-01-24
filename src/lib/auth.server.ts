@@ -5,6 +5,7 @@ import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "$env/static/private";
 import type { D1Database } from "@cloudflare/workers-types";
 import type { Database } from "bun:sqlite";
 import { D1Adapter, BunSQLiteAdapter } from "@lucia-auth/adapter-sqlite";
+import type { DB } from "./db/types";
 
 export async function initializeLucia(db: D1Database | Database) {
   const tableNames = {
@@ -26,14 +27,18 @@ export async function initializeLucia(db: D1Database | Database) {
         secure: !dev,
       },
     },
+    getUserAttributes: ({ pfp_url, name }) => ({ pfp_url, name }),
   });
 }
 
 declare module "lucia" {
   interface Register {
     Lucia: Awaited<ReturnType<typeof initializeLucia>>;
+    DatabaseUserAttributes: DatabaseUserAttributes;
   }
 }
+
+type DatabaseUserAttributes = DB["Users"];
 
 export const redirectURL = dev
   ? "http://localhost:5173/auth/google/callback"

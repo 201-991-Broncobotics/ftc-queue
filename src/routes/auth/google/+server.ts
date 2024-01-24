@@ -7,7 +7,9 @@ import { generateState, generateCodeVerifier } from "arctic";
 export async function GET(event: RequestEvent) {
   const state = generateState();
   const codeVerifier = generateCodeVerifier();
-  const url = await google.createAuthorizationURL(state, codeVerifier);
+  const url = await google.createAuthorizationURL(state, codeVerifier, {
+    scopes: ["profile"]
+  });
 
   const cookieOptions = {
     secure: !dev,
