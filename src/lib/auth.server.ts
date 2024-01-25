@@ -27,7 +27,11 @@ export async function initializeLucia(db: D1Database | Database) {
         secure: !dev,
       },
     },
-    getUserAttributes: ({ pfp_url, name }) => ({ pfp_url, name }),
+    getUserAttributes: ({ pfp_url, name, phone_number }) => ({
+      pfp_url,
+      name,
+      phone_number,
+    }),
   });
 }
 
