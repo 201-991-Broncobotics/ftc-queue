@@ -18,6 +18,8 @@
   let tel: E164Number | null = phone_number;
   let country: CountryCode = "US";
 
+  let submitting = false;
+
   function initials(name: string) {
     return name
       .split(" ")
@@ -79,7 +81,7 @@
     <TelInput bind:value={tel} bind:country />
 
     <Drawer.Footer>
-      <form method="POST" action="/?/phone" use:enhance>
+      <form method="POST" action="/?/phone" use:enhance={() => () => (open = false)}>
         <input type="hidden" value={tel} name="tel"/>
         <Button type="submit">Submit</Button>
       </form>
