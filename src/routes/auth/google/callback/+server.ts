@@ -1,4 +1,4 @@
-import { google, redirectURL } from "$lib/auth.server";
+import { redirectURL } from "$lib/auth.server";
 import type { RequestEvent } from "./$types";
 import { redirect } from "@sveltejs/kit";
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "$env/static/private";
@@ -87,5 +87,5 @@ export async function GET(event: RequestEvent) {
     ...sessionCookie.attributes,
   });
 
-  return redirect(302, "/");
+  return redirect(302, "/admin");
 }
