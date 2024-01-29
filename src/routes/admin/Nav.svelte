@@ -1,14 +1,13 @@
 <script lang="ts">
-  import * as Avatar from "$lib/components/ui/avatar";
   import { Button } from "$lib/components/ui/button";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
   import { toggleMode } from "mode-watcher";
   import { Sun, Moon } from "radix-icons-svelte";
   import * as Drawer from "$lib/components/ui/drawer";
+  import * as Avatar from "$lib/components/ui/avatar";
   import { TelInput } from "svelte-tel-input";
   import type { E164Number, CountryCode } from "svelte-tel-input/types";
-  import {enhance} from "$app/forms"
-
+  import { enhance } from "$app/forms";
 
   export let name: string;
   export let pfp_url: string;
@@ -63,7 +62,6 @@
       <DropdownMenu.Item asChild>
         <Button type="submit">Log out</Button>
       </DropdownMenu.Item>
-
       <DropdownMenu.Item asChild>
         <Button on:click={() => (open = true)}>Edit Phone Number</Button>
       </DropdownMenu.Item>
@@ -77,12 +75,14 @@
       <Drawer.Title>Edit your phone number</Drawer.Title>
       <Drawer.Description>Enter your new phone number</Drawer.Description>
     </Drawer.Header>
-
     <TelInput bind:value={tel} bind:country />
-
     <Drawer.Footer>
-      <form method="POST" action="/?/phone" use:enhance={() => () => (open = false)}>
-        <input type="hidden" value={tel} name="tel"/>
+      <form
+        method="POST"
+        action="/?/phone"
+        use:enhance={() => () => (open = false)}
+      >
+        <input type="hidden" value={tel} name="tel" />
         <Button type="submit">Submit</Button>
       </form>
     </Drawer.Footer>

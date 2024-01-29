@@ -7,7 +7,6 @@ export type Database = Kysely<DB>;
 export async function createCompetition(
   db: Database,
   toaId: string,
-  name: string,
   userId: string,
 ) {
   await db.transaction().execute(async (tx) => {
@@ -15,9 +14,9 @@ export async function createCompetition(
       .insertInto("Competitions")
       .values({
         toa_id: toaId,
+        id: nanoid(),
         // it's called "secret", but we dgaf about security for this, and being able to type it easily could be useful
         secret: nanoid(8),
-        name,
       })
       .execute();
 

@@ -42,7 +42,7 @@ model Teams {
 }
 
 model Competitions {
-  id     String @id @map("name")
+  id     String @id
   secret String
   toa_id String
 
