@@ -2,7 +2,7 @@ import { fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 import { zfd } from "zod-form-data";
 import { z } from "zod";
-import isMobilePhone from "validator/es/lib/isMobilePhone";
+import isMobilePhone from "validator/lib/isMobilePhone";
 import { nanoid } from "$lib/nanoid.server";
 import { parseURL } from "ufo";
 import { toa } from "$lib/toa.server";
