@@ -6,7 +6,7 @@
   // export let data: LayoutData;
 </script>
 
-<Nav>
+<Nav title="FTC Queue Admin">
   <form method="post" action="/logout">
     <Button type="submit">logout</Button>
   </form>

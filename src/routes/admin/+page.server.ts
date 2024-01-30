@@ -25,7 +25,7 @@ export const load = (async ({ locals }) => {
       sql<number>`(SELECT COUNT(*) FROM Matches WHERE competition_id = Competitions.id AND Matches.is_done = 1)`.as(
         "done_matches",
       ),
-      sql<number>`(SELECT COUNT(*) FROM Matches WHERE competition_id = Competitions.id AND Matches.is_queuing = 1)`.as(
+      sql<number>`(SELECT COUNT(*) FROM Matches WHERE competition_id = Competitions.id AND Matches.is_queuing = 1 AND Matches.is_done = 0)`.as(
         "queueing_matches",
       ),
       sql<number>`(SELECT COUNT(*) FROM Matches WHERE competition_id = Competitions.id)`.as(
@@ -115,5 +115,38 @@ export const actions = {
         })
         .execute();
     });
+  },
+
+  joinComp: async ({ locals, request }) => {
+    if (!locals.user) throw redirect(302, "/login");
+    const data = zfd
+      .formData({
+        secret: zfd.text(z.string().min(3)),
+      })
+      .safeParse(await request.formData());
+
+    if (!data.success) {
+      return fail(402);
+    }
+
+    const { secret } = data.data;
+
+    const comp = await locals.db
+      .selectFrom("Competitions")
+      .where("secret", "=", secret)
+      .select(["id"])
+      .executeTakeFirst();
+
+    if (!comp) return fail(404);
+
+    await locals.db
+      .insertInto("_CompetitionsToUsers")
+      .values({
+        A: comp.id,
+        B: locals.user.id,
+      })
+      .execute();
+
+    return redirect(302, "/admin");
   },
 } satisfies Actions;

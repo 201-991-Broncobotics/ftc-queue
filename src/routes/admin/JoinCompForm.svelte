@@ -7,21 +7,17 @@
 
 <Drawer.Root>
   <Drawer.Trigger asChild let:builder>
-    <Button builders={[builder]}>Create Competition</Button>
+    <Button builders={[builder]}>Join Competition</Button>
   </Drawer.Trigger>
   <Drawer.Content>
     <Drawer.Header>
-      <Drawer.Title>Create Competition</Drawer.Title>
+      <Drawer.Title>Join Competition</Drawer.Title>
     </Drawer.Header>
     <div>
       <!-- TODO: shadcn svelte form https://www.shadcn-svelte.com/docs/components/form -->
-      <form method="post" action="?/createComp" use:enhance>
-        <Input
-          type="text"
-          placeholder="Link on Orange Alliance"
-          name="toaLink"
-        />
-        <Button type="submit">Create</Button>
+      <form method="post" action="/j/c" use:enhance>
+        <Input type="text" placeholder="Competition Secret" name="secret" />
+        <Button type="submit">Join</Button>
       </form>
     </div>
   </Drawer.Content>
