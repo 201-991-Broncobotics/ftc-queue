@@ -45,6 +45,7 @@ model Competitions {
   id     String @id
   secret String
   toa_id String
+  name   String
 
   teams   Teams[]
   matches Matches[]
@@ -56,8 +57,8 @@ model Matches {
   is_queuing Boolean
   is_done    Boolean
 
-  Competitions     Competitions @relation(fields: [competition_name], references: [id])
-  competition_name String
+  Competitions     Competitions @relation(fields: [competition_id], references: [id])
+  competition_id String
 
   teams TeamToMatch[]
 }

@@ -1,9 +1,11 @@
 <script lang="ts">
-    import { DropdownMenu } from "$lib/components/ui/dropdown-menu";
   import type { PageData } from "./$types";
 
   export let data: PageData;
-
 </script>
 
+{JSON.stringify(data)}
 
+{#each data.comps as comp}
+  {JSON.stringify(comp, null, 2)}
+{/each}

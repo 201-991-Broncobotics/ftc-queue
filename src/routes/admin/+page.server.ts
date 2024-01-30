@@ -1,11 +1,43 @@
 import { fail, redirect } from "@sveltejs/kit";
-import type { Actions } from "./$types";
+import type { Actions, PageServerLoad } from "./$types";
 import { zfd } from "zod-form-data";
 import { z } from "zod";
 import isMobilePhone from "validator/es/lib/isMobilePhone";
 import { nanoid } from "$lib/nanoid.server";
 import { parseURL } from "ufo";
 import { toa } from "$lib/toa.server";
+import { sql } from "kysely";
+
+export const load = (async ({ locals }) => {
+  if (!locals.user) throw redirect(302, "/login");
+
+  const comps = await locals.db
+    .selectFrom("Competitions")
+    .innerJoin(
+      "_CompetitionsToUsers",
+      "Competitions.id",
+      "_CompetitionsToUsers.A",
+    )
+    .select(["Competitions.id as comp_id", "Competitions.name as comp_name"])
+    .where("_CompetitionsToUsers.B", "=", locals.user.id)
+    .select(() => [
+      // no idea how to do this in kysely syntax, but this works so idrc
+      sql<number>`(SELECT COUNT(*) FROM Matches WHERE competition_id = Competitions.id AND Matches.is_done = 1)`.as(
+        "done_matches",
+      ),
+      sql<number>`(SELECT COUNT(*) FROM Matches WHERE competition_id = Competitions.id AND Matches.is_queuing = 1)`.as(
+        "queueing_matches",
+      ),
+      sql<number>`(SELECT COUNT(*) FROM Matches WHERE competition_id = Competitions.id)`.as(
+        "total_matches",
+      ),
+    ])
+    .execute();
+
+  return {
+    comps: comps,
+  };
+}) satisfies PageServerLoad;
 
 export const actions = {
   phone: async ({ locals, request }) => {
@@ -55,8 +87,9 @@ export const actions = {
 
     const toa_id = pathname.split("/")[2]!;
     // check 2 that it's valid toa_id
+    let eventName: string;
     try {
-      await toa.getEvent(toa_id);
+      eventName = (await toa.getEvent(toa_id)).eventName;
     } catch (_) {
       return fail(400);
     }
@@ -70,6 +103,7 @@ export const actions = {
           secret: nanoid(8),
           toa_id,
           id: comp_id,
+          name: eventName,
         })
         .execute();
 

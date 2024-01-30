@@ -8,6 +8,7 @@ export type Competitions = {
     id: string;
     secret: string;
     toa_id: string;
+    name: string;
 };
 export type CompetitionsToUsers = {
     A: string;
@@ -17,7 +18,7 @@ export type Matches = {
     id: string;
     is_queuing: number;
     is_done: number;
-    competition_name: string;
+    competition_id: string;
 };
 export type Sessions = {
     id: string;

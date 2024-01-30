@@ -1,10 +1,9 @@
 <script lang="ts">
   import Nav from "$lib/components/Nav.svelte";
   import { Button } from "$lib/components/ui/button";
-  import type { LayoutData } from "./$types";
-  import { ModeWatcher } from "mode-watcher";
+  // import type { LayoutData } from "./$types";
 
-  export let data: LayoutData;
+  // export let data: LayoutData;
 </script>
 
 <Nav>
@@ -12,3 +11,5 @@
     <Button type="submit">logout</Button>
   </form>
 </Nav>
+
+<slot />
