@@ -1,6 +1,7 @@
 import { redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 import { toa } from "$lib/toa.server";
+import type { AllianceRecord, BasicMatch } from "./types";
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   const { comp_id } = params;
@@ -9,8 +10,54 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
   const comp = await getComp(locals.db, locals.user.id, comp_id);
 
+  const teamsInMatch = new Map<
+    string,
+    Partial<AllianceRecord<{ team_number: number }>>
+  >();
+
+  const m = await locals.db
+    .selectFrom("Matches")
+    .where("competition_id", "=", comp.id)
+    .innerJoin("TeamToMatch", "Matches.id", "TeamToMatch.match_id")
+    .select([
+      "name",
+      "is_queuing",
+      "is_done",
+      "alliance",
+      "team_id",
+      "match_id",
+      "order",
+    ])
+    .execute();
+
+  m.forEach((match) => {
+    if (!teamsInMatch.has(match.match_id)) {
+      teamsInMatch.set(match.match_id, {});
+    }
+
+    const alliance = teamsInMatch.get(match.match_id)!;
+    // @ts-expect-error I'm way too lazy to fix this on the type level
+    alliance[match.alliance] = {
+      team_number: parseInt(match.team_id.split(":")[1]!),
+    };
+  });
+
+  // remove duplicated "match_id"s
+  const matches: BasicMatch[] = m
+    .filter(
+      (m, i, arr) => arr.findIndex((m2) => m2.match_id === m.match_id) === i,
+    )
+    .map((m) => ({
+      ...m,
+      teams: teamsInMatch.get(m.match_id) as any,
+      is_done: !!m.is_done,
+      is_queuing: !!m.is_queuing,
+      alliance: undefined,
+    }));
+
   return {
     comp,
+    matches,
   };
 };
 
