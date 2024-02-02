@@ -3,6 +3,6 @@ import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals }) => {
   if (locals.user) {
-    throw redirect(302, "/admin");
+    throw redirect(307, "/admin");
   }
 };

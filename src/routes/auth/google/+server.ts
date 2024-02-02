@@ -21,5 +21,5 @@ export async function GET(event: RequestEvent) {
   event.cookies.set("google_auth_state", state, cookieOptions);
   event.cookies.set("google_auth_code_verifier", codeVerifier, cookieOptions);
 
-  return redirect(302, url);
+  return redirect(307, url);
 }

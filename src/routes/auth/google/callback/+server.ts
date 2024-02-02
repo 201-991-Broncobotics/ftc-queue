@@ -87,5 +87,5 @@ export async function GET(event: RequestEvent) {
     ...sessionCookie.attributes,
   });
 
-  return redirect(302, "/admin");
+  return redirect(307, "/admin");
 }

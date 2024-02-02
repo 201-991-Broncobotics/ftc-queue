@@ -9,7 +9,7 @@ import { toa } from "$lib/toa.server";
 import { sql } from "kysely";
 
 export const load = (async ({ locals }) => {
-  if (!locals.user) throw redirect(302, "/login");
+  if (!locals.user) throw redirect(307, "/login");
 
   const comps = await locals.db
     .selectFrom("Competitions")
@@ -41,7 +41,7 @@ export const load = (async ({ locals }) => {
 
 export const actions = {
   phone: async ({ locals, request }) => {
-    if (!locals.user) throw redirect(302, "/login");
+    if (!locals.user) throw redirect(307, "/login");
 
     const schema = zfd.formData({
       tel: zfd
@@ -67,7 +67,7 @@ export const actions = {
   },
 
   createComp: async ({ locals, request }) => {
-    if (!locals.user) throw redirect(302, "/login");
+    if (!locals.user) throw redirect(307, "/login");
 
     const schema = zfd.formData({
       toaLink: zfd.text(z.string().url()),
@@ -89,7 +89,9 @@ export const actions = {
     // check 2 that it's valid toa_id
     let eventName: string;
     try {
-      eventName = (await toa.getEvent(toa_id)).eventName;
+      const event = await toa.getEvent(toa_id);
+
+      eventName = event.eventName;
     } catch (_) {
       return fail(400);
     }
@@ -118,7 +120,7 @@ export const actions = {
   },
 
   joinComp: async ({ locals, request }) => {
-    if (!locals.user) throw redirect(302, "/login");
+    if (!locals.user) throw redirect(307, "/login");
     const data = zfd
       .formData({
         secret: zfd.text(z.string().min(3)),
@@ -147,6 +149,6 @@ export const actions = {
       })
       .execute();
 
-    return redirect(302, "/admin");
+    return redirect(307, "/admin");
   },
 } satisfies Actions;

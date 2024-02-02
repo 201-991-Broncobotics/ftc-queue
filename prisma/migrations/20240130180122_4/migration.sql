@@ -48,4 +48,3 @@ CREATE TABLE "new_Teams" (
 INSERT INTO "new_Teams" ("competition_name", "id", "team_number") SELECT "competition_name", "id", "team_number" FROM "Teams";
 DROP TABLE "Teams";
 ALTER TABLE "new_Teams" RENAME TO "Teams";
-PRAGMA foreign_keys=ON;

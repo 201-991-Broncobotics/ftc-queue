@@ -18,6 +18,8 @@ export type Matches = {
     id: string;
     is_queuing: number;
     is_done: number;
+    name: string;
+    order: number;
     competition_id: string;
 };
 export type Sessions = {
@@ -27,13 +29,15 @@ export type Sessions = {
 };
 export type Teams = {
     id: string;
+    name: string;
     team_number: number;
-    competition_name: string;
+    competition_id: string;
 };
 export type TeamToMatch = {
     alliance: string;
     team_id: string;
     match_id: string;
+    competitionsId: string | null;
 };
 export type Users = {
     id: string;

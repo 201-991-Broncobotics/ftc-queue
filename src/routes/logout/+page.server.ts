@@ -15,6 +15,6 @@ export const actions: Actions = {
       ...newSession.attributes,
     });
 
-    throw redirect(302, "/login");
+    throw redirect(307, "/login");
   },
 };
